@@ -2,6 +2,9 @@ use std::env;
 use std::path::PathBuf;
 
 fn main() -> Result<(), ()> {
+    if std::env::var("DOCS_RS").is_ok() {
+        return Ok(());
+    }
     println!("cargo:rerun-if-changed=build.rs");
 
     let hfst_lib = pkg_config::Config::new()

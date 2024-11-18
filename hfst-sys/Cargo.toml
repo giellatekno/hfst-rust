@@ -1,6 +1,6 @@
 [package]
 name = "hfst-sys"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 links = "hfst_c"
 license = "GPL-3.0-or-later"
