@@ -1,0 +1,11 @@
+[package]
+name = "hfst-sys"
+version = "0.1.0"
+edition = "2021"
+links = "hfst_c"
+
+[dependencies]
+
+[build-dependencies]
+bindgen = "0.70.1"
+pkg-config = "0.3.31"
