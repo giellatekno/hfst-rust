@@ -3,6 +3,9 @@ name = "hfst-sys"
 version = "0.1.0"
 edition = "2021"
 links = "hfst_c"
+license = "GPL-3.0-or-later"
+description = "Wrappers to libhfst (raw bindings to the c api)"
+repository = "https://github.com/giellatekno/hfst-rust"
 
 [dependencies]
 
