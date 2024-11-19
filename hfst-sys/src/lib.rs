@@ -1,19 +1,13 @@
-#![cfg(not(docsrs))]
 #![allow(non_upper_case_globals)]
-#![cfg(not(docsrs))]
 #![allow(non_camel_case_types)]
-#![cfg(not(docsrs))]
 #![allow(non_snake_case)]
 
-#[cfg(docsrs)]
-include!("expanded.rs");
-#[cfg(not(docsrs))]
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::os::raw::c_char;
+    use std::{os::raw::c_char, str::Utf8Error};
 
     /// Length of c string
     fn strlen(s: *const c_char) -> usize {
@@ -28,6 +22,32 @@ mod tests {
     fn c_charptr_to_string(s: *const c_char) -> String {
         let len = strlen(s);
         unsafe { String::from_raw_parts(s as *mut u8, len, len) }
+    }
+
+    fn c_charptr_as_str<'a>(s: *const c_char) -> Result<&'a str, Utf8Error> {
+        unsafe {
+            std::str::from_utf8(
+                std::slice::from_raw_parts(s as *const u8, strlen(s))
+            )
+        }
+    }
+
+    fn c_charptr_as_str_unchecked<'a>(s: *const c_char) -> &'a str {
+        unsafe {
+            std::str::from_utf8_unchecked(
+                std::slice::from_raw_parts(s as *const u8, strlen(s))
+            )
+        }
+    }
+
+    trait RemoveAts {
+        fn remove_ats(self) -> String;
+    }
+
+    impl RemoveAts for &str {
+        fn remove_ats(self) -> String {
+            remove_ats(self)
+        }
     }
 
     /// Remove everything between '@' from `s`.
@@ -94,8 +114,8 @@ mod tests {
                     &mut w,
                 );
 
-                let rust_string = c_charptr_to_string(s);
-                let seen_analysis = remove_ats(&rust_string);
+                let seen_analysis = c_charptr_as_str_unchecked(s).remove_ats();
+                println!("{}", seen_analysis);
                 let Some(v) = expected_analyses.get_mut(seen_analysis.as_str()) else {
                     panic!("got an analysis we did not expect: {}", seen_analysis);
                 };

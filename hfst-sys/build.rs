@@ -2,7 +2,11 @@ use std::env;
 use std::path::PathBuf;
 
 fn main() -> Result<(), ()> {
+    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
+
     if std::env::var("DOCS_RS").is_ok() {
+        std::fs::copy("src/expanded.rs", out_path.join("bindings.rs"))
+            .expect("Couldn't copy pre-expanded bindings on docs.rs");
         return Ok(());
     }
     println!("cargo:rerun-if-changed=build.rs");
@@ -63,7 +67,6 @@ fn main() -> Result<(), ()> {
         .expect("Unable to generate bindings");
 
     // Write the bindings to the $OUT_DIR/bindings.rs file.
-    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
     bindings
         .write_to_file(out_path.join("bindings.rs"))
         .expect("Couldn't write bindings!");
