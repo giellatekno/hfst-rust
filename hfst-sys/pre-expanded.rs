@@ -1,11 +1,3 @@
-#![feature(prelude_import)]
-#![allow(non_upper_case_globals)]
-#![allow(non_camel_case_types)]
-#![allow(non_snake_case)]
-#[prelude_import]
-use std::prelude::rust_2021::*;
-#[macro_use]
-extern crate std;
 #[repr(C)]
 pub struct ResultIterator {
     pub begin: *mut ::std::os::raw::c_void,

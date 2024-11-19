@@ -5,10 +5,11 @@ fn main() -> Result<(), ()> {
     let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
 
     if std::env::var("DOCS_RS").is_ok() {
-        std::fs::copy("src/expanded.rs", out_path.join("bindings.rs"))
+        std::fs::copy("pre-expanded.rs", out_path.join("bindings.rs"))
             .expect("Couldn't copy pre-expanded bindings on docs.rs");
         return Ok(());
     }
+
     println!("cargo:rerun-if-changed=build.rs");
 
     let hfst_lib = pkg_config::Config::new()
