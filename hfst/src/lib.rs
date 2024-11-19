@@ -40,21 +40,22 @@ fn c_charptr_to_string(s: *const c_char) -> String {
     unsafe { String::from_raw_parts(s as *mut u8, len, len) }
 }
 
-/// Structure used to load fst files.
+/// A stream for reading binary HFST transducers. Often from a file.
+/// This structure is a wrapper around the C++ HfstInputStream.
 pub struct HfstInputStream {
     // An opaque pointer to an instance of the C++ HfstInputStream class
     inner: *mut c_void,
 }
 
-/// A transducer
+/// A transducer. Wraps the C++ HfstTransducer.
 pub struct HfstTransducer {
     // Opaque pointer to a C++ HfstTransducer
     inner: *mut c_void,
 }
 
-// SAFETY: The transducer can move between threads. Nothing will go wrong
-// if one thread creates an HfstTransducer, and then another thread uses it.
-// (This is required in order to be able to store in a Axum's State)
+/// SAFETY: The transducer can move between threads. Nothing will go wrong
+/// if one thread creates an HfstTransducer, and then another thread uses it.
+/// (This is required in order to be able to store in a Axum's State)
 unsafe impl Send for HfstTransducer {}
 
 // anders: the code currently in hfst doesn't check errors.
@@ -155,7 +156,9 @@ impl Drop for HfstInputStream {
     }
 }
 
-/// A lookup. You get this type back
+/// Represents a handle to a lookup in progress. This structure is returned
+/// from [`HfstTransducer::lookup`]. This type implements [`IntoIterator`],
+/// to iterate over the results in the lookup.
 pub struct HfstLookup {
     handle: *mut c_void,
 }
@@ -179,6 +182,8 @@ pub struct HfstLookupIterator {
 }
 
 impl Iterator for HfstLookupIterator {
+    /// The type of the elements being iterated over. In the lookup case,
+    /// the full string, as well as a weight.
     type Item = (String, f32);
 
     fn next(&mut self) -> Option<Self::Item> {
