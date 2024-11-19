@@ -1,6 +1,8 @@
+#![cfg(not(docsrs))]
 #![allow(non_upper_case_globals)]
+#![cfg(not(docsrs))]
 #![allow(non_camel_case_types)]
-#![allow(non_snake_case)]
+#![cfg(not(docsrs))]
 #![allow(non_snake_case)]
 
 #[cfg(docsrs)]
