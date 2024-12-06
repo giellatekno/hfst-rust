@@ -2,8 +2,8 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
-#![cfg(docsrs)]
-#![feature(builtin_syntax)]
+//#![cfg(docsrs)]
+//#![feature(builtin_syntax)]
 
 include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 
@@ -81,12 +81,16 @@ mod tests {
         out
     }
 
+    fn str_as_cstr(s: &str) -> *const c_char {
+        assert!(s.ends_with('\0'));
+        s.as_ptr() as *const c_char
+    }
+
     #[test]
     #[ignore]
     fn open_read_close() -> Result<(), String> {
         let path = "/usr/share/giella/sme/analyser-dict-gt-desc.hfstol\0";
-        let path = path.as_ptr() as *const c_char;
-        let input_stream = unsafe { hfst_input_stream(path) };
+        let input_stream = unsafe { hfst_input_stream(str_as_cstr(path)) };
         if input_stream.is_null() {
             return Err(format!("input_stream was NULL"));
         }
@@ -103,7 +107,7 @@ mod tests {
         expected_analyses.insert("viessut+V+IV+PrsPrc", false);
         expected_analyses.insert("viessu+N+Sg+Nom", false);
 
-        let lookup_str = "viessu\0".as_ptr() as *const c_char;
+        let lookup_str = str_as_cstr("viessu\0");
         let lookup = unsafe { hfst_lookup(tr, lookup_str) };
         let iter = unsafe { hfst_lookup_iterator(lookup) };
 
@@ -132,6 +136,15 @@ mod tests {
         assert!(all_seen);
 
         unsafe { hfst_input_stream_close(input_stream) };
+        Ok(())
+    }
+
+    #[test]
+    #[ignore]
+    fn opening_nonexistant_fails() -> Result<(), String> {
+        let path = "/this/does/not/exist\0";
+        let input_stream = unsafe { hfst_input_stream(str_as_cstr(path)) };
+        assert!(input_stream.is_null());
         Ok(())
     }
 }

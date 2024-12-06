@@ -2,10 +2,13 @@ use std::env;
 use std::path::PathBuf;
 
 fn main() -> Result<(), ()> {
-    let out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
+    let mut out_path = PathBuf::from(env::var("OUT_DIR").unwrap());
+    out_path.push("bindings.rs");
+
+    println!("out_path, {:?}", out_path);
 
     if std::env::var("DOCS_RS").is_ok() {
-        std::fs::copy("pre-expanded.rs", out_path.join("bindings.rs"))
+        std::fs::copy("pre-expanded.rs", out_path)
             .expect("Couldn't copy pre-expanded bindings on docs.rs");
         return Ok(());
     }
@@ -33,6 +36,10 @@ fn main() -> Result<(), ()> {
     // to bindgen, and lets you build up options for
     // the resulting bindings.
     let bindings = bindgen::Builder::default()
+        .generate_comments(true)
+        .merge_extern_blocks(true)
+        .rust_target(bindgen::RustTarget::Stable_1_77)
+        .clang_arg("-fretain-comments-from-system-headers")
         // The input header we would like to generate bindings for.
         // .hpp wrapper, so it understands "extern C"", etc
         //.header("/usr/include/hfst/hfst.h")
@@ -48,7 +55,7 @@ fn main() -> Result<(), ()> {
         .allowlist_item("hfst_input_stream_is_eof")
         .allowlist_item("hfst_input_stream_is_bad")
         .allowlist_item("hfst_transducer_from_stream")
-        //.allowlist_item("hfst_lookup_begin")
+        .allowlist_item("hfst_lookup_begin")
         //.allowlist_item("hfst_lookup_results")
         .allowlist_item("hfst_lookup")
         .allowlist_item("hfst_lookup_iterator")
@@ -69,7 +76,7 @@ fn main() -> Result<(), ()> {
 
     // Write the bindings to the $OUT_DIR/bindings.rs file.
     bindings
-        .write_to_file(out_path.join("bindings.rs"))
+        .write_to_file(out_path)
         .expect("Couldn't write bindings!");
 
     Ok(())
