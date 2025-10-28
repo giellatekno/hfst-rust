@@ -140,11 +140,44 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
-    fn opening_nonexistant_fails() -> Result<(), String> {
+    fn input_stream_nonexistant_fails() -> Result<(), String> {
         let path = "/this/does/not/exist\0";
         let input_stream = unsafe { hfst_input_stream(str_as_cstr(path)) };
         assert!(input_stream.is_null());
+        Ok(())
+    }
+
+    #[test]
+    fn tokenizer_open_nonexistant_fails_with_error_1() -> Result<(), String> {
+        let path = c"/non/existant/path";
+        let mut error: std::ffi::c_int = 0;
+        let tokenizer = unsafe {
+            hfst_tokenizer_open(path.as_ptr(), &raw mut error)
+        };
+        assert!(tokenizer.is_null());
+        assert_eq!(error, 1);
+        Ok(())
+    }
+
+    #[test]
+    fn test_tokenize() -> Result<(), String> {
+        let path = c"/usr/share/giella/sme/tokeniser-disamb-gt-desc.pmhfst";
+
+        let mut error: std::ffi::c_int = 0;
+        let tokenizer = unsafe { hfst_tokenizer_open(path.as_ptr(), &raw mut error) };
+
+        assert!(!tokenizer.is_null());
+
+        let input = c"Mun lean Anders\n".to_owned();
+        //let input = c"Mun lean Anders, ja mun barggan universitehtas\n\n".to_owned();
+        let len = strlen(input.as_ptr());
+
+        let output = unsafe {
+            hfst_tokenizer_tokenize(tokenizer, input.as_ptr(), len)
+        };
+
+        let output = unsafe { std::ffi::CStr::from_ptr(output) };
+        println!("we got {} bytes of output: '{:?}'", strlen(output.as_ptr()), output);
         Ok(())
     }
 }

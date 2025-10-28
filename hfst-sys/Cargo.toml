@@ -1,8 +1,9 @@
 [package]
 name = "hfst-sys"
 version = "0.1.7"
-edition = "2021"
+edition = "2024"
 links = "hfst_c"
+build = "build.rs"
 license = "GPL-3.0-or-later"
 description = "Wrappers to libhfst (raw bindings to the c api)"
 repository = "https://github.com/giellatekno/hfst-rust"
@@ -10,5 +11,5 @@ repository = "https://github.com/giellatekno/hfst-rust"
 [dependencies]
 
 [build-dependencies]
-bindgen = "0.70.1"
+bindgen = "0.72.1"
 pkg-config = "0.3.31"

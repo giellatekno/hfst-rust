@@ -1,9 +1,9 @@
 [package]
 name = "hfst"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 license = "GPL-3.0-or-later"
-description = "Wrappers to libhfst"
+description = "Wrappers to libhfst via libhfst_c"
 repository = "https://github.com/giellatekno/hfst-rust"
 
 [dependencies]
