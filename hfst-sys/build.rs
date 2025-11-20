@@ -13,11 +13,7 @@ fn main() -> Result<(), ()> {
         return Ok(());
     }
 
-    let installed_lib_dir = "/home/anders/projects/hfst/local_install/lib";
-    let libhfst_c_path = format!("{installed_lib_dir}/libhfst_c.so");
     println!("cargo:rerun-if-changed=build.rs");
-    println!("cargo:rustc-env=LD_LIBRARY_PATH={installed_lib_dir}");
-    println!("cargo:rustc-link-search={installed_lib_dir}");
 
     let hfst_lib = pkg_config::Config::new()
         .atleast_version("0.0.0")

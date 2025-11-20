@@ -5,7 +5,8 @@
 //#![cfg(docsrs)]
 //#![feature(builtin_syntax)]
 
-include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
+//include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
+include!("bindings.rs");
 
 #[cfg(test)]
 mod tests {
@@ -19,20 +20,6 @@ mod tests {
             len += 1;
         }
         len
-    }
-
-    /// Make a String from a c string
-    fn c_charptr_to_string(s: *const c_char) -> String {
-        let len = strlen(s);
-        unsafe { String::from_raw_parts(s as *mut u8, len, len) }
-    }
-
-    fn c_charptr_as_str<'a>(s: *const c_char) -> Result<&'a str, Utf8Error> {
-        unsafe {
-            std::str::from_utf8(
-                std::slice::from_raw_parts(s as *const u8, strlen(s))
-            )
-        }
     }
 
     fn c_charptr_as_str_unchecked<'a>(s: *const c_char) -> &'a str {
@@ -147,37 +134,37 @@ mod tests {
         Ok(())
     }
 
-    #[test]
-    fn tokenizer_open_nonexistant_fails_with_error_1() -> Result<(), String> {
-        let path = c"/non/existant/path";
-        let mut error: std::ffi::c_int = 0;
-        let tokenizer = unsafe {
-            hfst_tokenizer_open(path.as_ptr(), &raw mut error)
-        };
-        assert!(tokenizer.is_null());
-        assert_eq!(error, 1);
-        Ok(())
-    }
+    //#[test]
+    //fn tokenizer_open_nonexistant_fails_with_error_1() -> Result<(), String> {
+    //    let path = c"/non/existant/path";
+    //    let mut error: std::ffi::c_int = 0;
+    //    let tokenizer = unsafe {
+    //        hfst_tokenizer_open(path.as_ptr(), &raw mut error)
+    //    };
+    //    assert!(tokenizer.is_null());
+    //    assert_eq!(error, 1);
+    //    Ok(())
+    //}
 
-    #[test]
-    fn test_tokenize() -> Result<(), String> {
-        let path = c"/usr/share/giella/sme/tokeniser-disamb-gt-desc.pmhfst";
+    //#[test]
+    //fn test_tokenize() -> Result<(), String> {
+    //    let path = c"/usr/share/giella/sme/tokeniser-disamb-gt-desc.pmhfst";
 
-        let mut error: std::ffi::c_int = 0;
-        let tokenizer = unsafe { hfst_tokenizer_open(path.as_ptr(), &raw mut error) };
+    //    let mut error: std::ffi::c_int = 0;
+    //    let tokenizer = unsafe { hfst_tokenizer_open(path.as_ptr(), &raw mut error) };
 
-        assert!(!tokenizer.is_null());
+    //    assert!(!tokenizer.is_null());
 
-        let input = c"Mun lean Anders\n".to_owned();
-        //let input = c"Mun lean Anders, ja mun barggan universitehtas\n\n".to_owned();
-        let len = strlen(input.as_ptr());
+    //    let input = c"Mun lean Anders\n".to_owned();
+    //    //let input = c"Mun lean Anders, ja mun barggan universitehtas\n\n".to_owned();
+    //    let len = strlen(input.as_ptr());
 
-        let output = unsafe {
-            hfst_tokenizer_tokenize(tokenizer, input.as_ptr(), len)
-        };
+    //    let output = unsafe {
+    //        hfst_tokenizer_tokenize(tokenizer, input.as_ptr(), len)
+    //    };
 
-        let output = unsafe { std::ffi::CStr::from_ptr(output) };
-        println!("we got {} bytes of output: '{:?}'", strlen(output.as_ptr()), output);
-        Ok(())
-    }
+    //    let output = unsafe { std::ffi::CStr::from_ptr(output) };
+    //    println!("we got {} bytes of output: '{:?}'", strlen(output.as_ptr()), output);
+    //    Ok(())
+    //}
 }

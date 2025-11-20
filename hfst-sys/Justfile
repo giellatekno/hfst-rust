@@ -1,0 +1,36 @@
+alias b := bindings
+alias t := test
+
+default:
+    @just --list
+
+bindings:
+    bindgen wrapper.hpp -o src/bindings.rs --allowlist-item "hfst_.*"
+
+
+test:
+    cargo test
+
+test-ignored:
+    cargo test -- --ignored
+
+test-all: test test-ignored
+
+#        --allowlist-item hfst_free \
+#        --allowlist-item hfst_empty_transducer \
+#        --allowlist_item hfst_input_stream \
+#        --allowlist_item hfst_input_stream_close \
+#        --allowlist_item hfst_input_stream_free \
+#        --allowlist_item hfst_input_stream_is_eof \
+#        --allowlist_item hfst_input_stream_is_bad \
+#        --allowlist_item hfst_transducer_from_stream \
+#        --allowlist_item hfst_lookup_begin \
+#        --allowlist_item hfst_lookup \
+#        --allowlist_item hfst_lookup_iterator \
+#        --allowlist_item hfst_lookup_iterator_value \
+#        --allowlist_item hfst_lookup_iterator_next \
+#        --allowlist_item hfst_lookup_iterator_free \
+#        --allowlist_item hfst_lookup_iterator_done \
+#        --allowlist_item hfst_tokenizer_open \
+#        --allowlist_item hfst_tokenizer_tokenize
+
