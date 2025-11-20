@@ -7,4 +7,5 @@ description = "Wrappers to libhfst via libhfst_c"
 repository = "https://github.com/giellatekno/hfst-rust"
 
 [dependencies]
-hfst-sys = { version = "0.1.7" }
+hfst-sys = { version = "0.1.8" }
+

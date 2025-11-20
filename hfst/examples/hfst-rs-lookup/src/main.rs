@@ -1,5 +1,5 @@
-use std::time::Instant;
 use std::io::{self, BufRead};
+use std::time::Instant;
 
 use clap::Parser;
 use itertools::Itertools;
@@ -19,9 +19,7 @@ struct Args {
 }
 
 fn main() -> Result<(), String> {
-    let args = Args::parse();
-    let hfst = args.hfst;
-    let verbose = args.verbose;
+    let Args { hfst, verbose } = Args::parse();
 
     let t0 = Instant::now();
     let Ok(is) = HfstInputStream::new(&hfst) else {
@@ -52,9 +50,8 @@ fn main() -> Result<(), String> {
         if n == 0 {
             println!("{line} - <not found>");
         }
-        let t = Instant::now().duration_since(t0);
         if verbose {
-            println!("query took: {t:?}");
+            println!("query took: {:?}", t0.elapsed());
         }
     }
 
