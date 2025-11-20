@@ -194,7 +194,9 @@ dependencies = [
 
 [[package]]
 name = "hfst-sys"
-version = "0.1.7"
+version = "0.1.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "cab270e11d549394c373786b7e59ba863a55dea5c5747df378b2581a0786c5bd"
 dependencies = [
  "bindgen",
  "pkg-config",
