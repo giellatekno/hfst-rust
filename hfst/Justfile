@@ -1,0 +1,12 @@
+
+clippy:
+    cargo clippy --all-features
+
+doc:
+    cargo +nightly --color always doc --all-features
+
+watch-doc:
+    watch -tcn 2 cargo +nightly --color always doc --all-features
+
+check:
+    cargo check --all-features
