@@ -42,7 +42,6 @@
 //! }
 //! ```
 
-use std::sync::{Arc, Mutex};
 use std::time::{Duration, Instant};
 
 use tokio::sync::{mpsc, oneshot};
@@ -73,8 +72,9 @@ pub struct LookupResults {
     pub result_duration: Duration,
 }
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum LookupError {
+    #[error("channel to actor was closed")]
     ChannelClosed,
 }
 

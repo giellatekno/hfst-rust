@@ -1,12 +1,24 @@
 
+[private]
+default:
+    just --list
+
+# cargo build --release --all-features
+build:
+    cargo build --release --all-features
+
+# cargo clippy --all-features
 clippy:
     cargo clippy --all-features
 
+# cargo +nightly --color always doc --all-features
 doc:
     cargo +nightly --color always doc --all-features
 
+# watch -tcn 2 cargo +nightly --color always doc --all-features
 watch-doc:
     watch -tcn 2 cargo +nightly --color always doc --all-features
 
+# cargo check --all-features
 check:
     cargo check --all-features
