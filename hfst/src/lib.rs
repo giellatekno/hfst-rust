@@ -7,7 +7,6 @@
 #[cfg(feature = "tokio-actors")]
 pub mod transducer_actor;
 
-use hfst_sys;
 use std::ffi::{CString, c_float};
 use std::os::raw::{c_char, c_void};
 use std::path::Path;
@@ -256,15 +255,13 @@ mod tests {
     #[test]
     fn errors_on_opening_nonexistant() {
         let input_stream = HfstInputStream::new("/this/path/doesnt/exist");
-        assert!(matches!(input_stream, Err(())));
+        assert!(matches!(input_stream, Err(_)));
     }
 
     #[test]
     fn can_lookup() {
         let input_stream = HfstInputStream::new(PATH).unwrap();
-        let transducers = input_stream.read_transducers();
-        let transducer = transducers
-            .first()
+        let transducer = input_stream.read_only_transducer()
             .expect("the hfst input stream has at least one transducer");
         let query = "sko";
         let results = transducer.lookup(query);

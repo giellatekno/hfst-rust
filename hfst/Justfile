@@ -22,3 +22,7 @@ watch-doc:
 # cargo check --all-features
 check:
     cargo check --all-features
+
+# cargo +nightly test --all-features
+test:
+    cargo +nightly test --all-features
