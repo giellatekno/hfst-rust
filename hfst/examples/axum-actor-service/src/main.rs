@@ -19,12 +19,21 @@ type ActorMap = HashMap<String, HfstTransducerActor>;
 
 static HFST_TRANSDUCER_ACTORS: LazyLock<ActorMap> = LazyLock::new(initialize_hfst_transducer_actors);
 
-async fn analyze(lang: &str, text: &str) -> Result<(String, Vec<(String, f32)>), String> {
+async fn analyze(lang: &str, text: &str) -> Result<Vec<(String, Vec<(String, f32)>)>, String> {
     let actor = HFST_TRANSDUCER_ACTORS.get(lang)
         .ok_or_else(|| format!("no transducer for language {lang}"))?;
 
-    let lookup_results = actor.lookup(text).await.map_err(|e| format!("{e}"))?;
-    Ok((text.to_string(), lookup_results.results))
+    let inputs = text.split('\n')
+        .map(|s| s.trim())
+        .filter(|s| !s.is_empty());
+
+    let mut results = vec![];
+    for input in inputs {
+        let input = input.to_owned();
+        let lookup_results = actor.lookup(&input).await.map_err(|e| format!("{e}"))?;
+        results.push((input, lookup_results.results));
+    }
+    Ok(results)
 }
 
 fn read_lang_dir(path: &std::path::Path) -> Option<std::path::PathBuf> {
@@ -83,16 +92,29 @@ async fn analyze_endpoint(
     Query(QueryParams { lang, text }): Query<QueryParams>,
 ) -> Response {
     match analyze(&lang, &text).await {
-        Ok(response) => {
+        Ok(all_replies) => {
             let mut out = String::new();
-            for (value, weight) in response.1 {
-                for substr in without_ats_iter(&value) {
-                    out.push_str(&text);
+
+            // For all inputs (inputs are newline-delimited, and there can be more than,
+            // e.g. `curl "http://localhost:3001/?lang=sme&text=viessu%0ANew%20York"
+            for (input_text, replies) in all_replies {
+
+                // For all strings found for this input...
+                for (value, weight) in replies {
+                    // Print which input this output belongs to, followed by TAB
+                    out.push_str(&input_text);
                     out.push('\t');
-                    out.push_str(substr);
+
+                    // Print this reply. We use without_ats_iter to not get the flag
+                    // diacritics
+                    for substr in without_ats_iter(&value) {
+                        out.push_str(substr);
+                    }
+
+                    out.push('\t');
+                    out.push_str(&format!("{weight}"));
+                    out.push('\n');
                 }
-                out.push('\t');
-                out.push_str(&format!("{weight}"));
                 out.push('\n');
             }
             out.into_response()
